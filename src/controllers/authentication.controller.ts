@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { createUser, getUserByLogin } from "../service/user.service";
 import { authentication, random } from "../helpers";
 import { generateToken } from "../utils/jwt";
+import { User } from "../models/user.model";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -12,7 +13,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user: any = await getUserByLogin(login);
+    const user: User | null = await getUserByLogin(login);
+
     if (!user) {
       res.status(404).json({ errors: { message: "User not found" } });
       return;
@@ -36,7 +38,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.cookie("access_token", token, {
       httpOnly: true, // Prevents JavaScript access (more secure)
       secure: false, // Enable secure cookies in production
-      sameSite: "strict", // Prevents CSRF attacks
+      sameSite: "lax", // Prevents CSRF attacks
       domain: "localhost", // Change this for production
       path: "/",
       maxAge: 3600000, // 1 hour expiration
