@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { get, merge } from "lodash";
-import { getUserBySessionToken } from "../service/user.service";
+import { verifyToken } from "../utils/jwt";
 
 export const isOwn = async (
   req: Request,
@@ -35,23 +35,21 @@ export const isAuthenticated = async (
   next: NextFunction
 ) => {
   try {
-    const sessionToken = req.cookies["access_token"];
+    const token = req.headers.authorization?.split(" ")[1];
 
-    if (!sessionToken) {
+    if (!token) {
       res.sendStatus(403);
       return;
     }
 
-    const existingUser = await getUserBySessionToken(sessionToken);
+    try {
+      const userPayload = verifyToken(token);
 
-    if (!existingUser) {
+      merge(req, { identity: userPayload });
+      next();
+    } catch (error) {
       res.sendStatus(403);
-      return;
     }
-
-    merge(req, { identity: existingUser });
-
-    next();
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });

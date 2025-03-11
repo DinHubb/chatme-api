@@ -1,11 +1,7 @@
-export interface UserAuth {
-  password: string;
-  salt: string;
-}
-
 export interface User {
-  id: number;
+  id: string;
   username: string;
   email: string;
-  authentication: UserAuth[];
+  password: string;
+  createdAt: Date;
 }

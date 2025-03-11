@@ -1,22 +1,17 @@
 import { conn } from "../config/db";
-import { User, UserAuth } from "../models/user.model";
+import { User } from "../models/user.model";
 
 export const createUser = async (
-  username: string,
-  email: string,
-  auth: UserAuth
+  username: User,
+  email: User,
+  password: string
 ): Promise<number | null> => {
   try {
     const insertQuery = `
-      INSERT INTO users (username, email, password, salt) VALUES (?, ?, ?, ?)
+      INSERT INTO users (username, email, password) VALUES (?, ?, ?)
     `;
 
-    const [result] = await conn.query(insertQuery, [
-      username,
-      email,
-      auth.password,
-      auth.salt,
-    ]);
+    const [result] = await conn.query(insertQuery, [username, email, password]);
 
     return (result as any).insertId;
   } catch (error) {
@@ -37,42 +32,16 @@ export const getUserById = async (id: string) => {
   }
 };
 
-export const getUserByEmail = async (email: User): Promise<User | null> => {
+export const getUserByLogin = async (login: string): Promise<User | null> => {
   try {
     const [rows]: any = await conn.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
+      "SELECT * FROM users WHERE email = ? OR username = ?",
+      [login, login]
     );
 
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
     console.error("Error fetching user by email:", error);
-    return null;
-  }
-};
-
-export const updateSessionToken = async (
-  userId: number,
-  sessionToken: string
-) => {
-  await conn.query("UPDATE users SET sessionToken = ? WHERE id = ?", [
-    sessionToken,
-    userId,
-  ]);
-};
-
-export const getUserBySessionToken = async (sessionToken: string) => {
-  if (!sessionToken) return null;
-
-  try {
-    const [rows]: any = await conn.execute(
-      "SELECT * FROM users WHERE sessionToken = ? LIMIT 1",
-      [sessionToken]
-    );
-
-    return rows.length > 0 ? rows[0] : null;
-  } catch (error) {
-    console.error("Error fetching user by session token:", error);
     return null;
   }
 };
