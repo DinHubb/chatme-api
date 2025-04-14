@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon",
+    "init-db": "ts-node src/setup/create.tables.ts"
   },
   "keywords": [],
   "author": "",

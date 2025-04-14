@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createUser, getUserByLogin } from "../service/user.service";
+import { userService } from "../services/user.service";
 import { authentication, random } from "../helpers";
 import { generateToken } from "../utils/jwt";
 import { User } from "../models/user.model";
@@ -13,7 +13,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const user: User | null = await getUserByLogin(login);
+    const user: User | null = await userService.getUserByLogin(login);
 
     if (!user) {
       res.status(404).json({ errors: { message: "User not found" } });
@@ -22,7 +22,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     const expectedHash = authentication(password);
 
-    if (user.password !== expectedHash) {
+    if (user.password_hash !== expectedHash) {
       res
         .status(403)
         .json({ errors: { message: "Invalid login or password" } });
@@ -35,15 +35,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       email: user.email,
     });
 
-    res.cookie("access_token", token, {
-      httpOnly: true, // Prevents JavaScript access (more secure)
-      secure: false, // Enable secure cookies in production
-      sameSite: "lax", // Prevents CSRF attacks
-      domain: "localhost", // Change this for production
-      path: "/",
-      maxAge: 3600000, // 1 hour expiration
-    });
-
     res.status(200).json({ message: "Login successful", meta: { token } });
   } catch (error) {
     console.error("Login error:", error);
@@ -53,16 +44,17 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, username } = req.body;
+    const { msisdn, password, username } = req.body;
 
-    if (!email || !password || !username) {
+    if (!msisdn || !password || !username) {
       res.status(400).json({
-        error: "Invalid request. Email, username, and password are required.",
+        error:
+          "Invalid request. Phone number, username, and password are required.",
       });
       return;
     }
 
-    const existingUser = await getUserByLogin(email);
+    const existingUser = await userService.getUserByLogin(msisdn);
     if (existingUser) {
       res.status(400).json({ error: "User already exists." });
       return;
@@ -72,7 +64,11 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       password: authentication(password),
     };
 
-    const user = await createUser(username, email, authData.password);
+    const user = await userService.createUser(
+      username,
+      msisdn,
+      authData.password
+    );
 
     res.status(201).json(user);
   } catch (error) {
@@ -88,7 +84,9 @@ export const me = async (req: any, res: Response): Promise<void> => {
       return;
     }
 
-    res.status(200).json({ user: req?.identity });
+    const user = await userService.getUserById(req?.identity.id);
+
+    res.status(200).json({ user: user });
   } catch (error) {
     console.error("Error in auth/me:", error);
     res.status(500).json({ error: "Internal Server Error" });

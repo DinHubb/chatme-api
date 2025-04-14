@@ -13,4 +13,4 @@ const access: PoolOptions = {
   queueLimit: 0,
 };
 
-export const conn = mysql.createPool(access);
+export const db = mysql.createPool(access);
