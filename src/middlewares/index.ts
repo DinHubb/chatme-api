@@ -10,15 +10,18 @@ export const isOwn = async (
 ) => {
   try {
     const { id } = req.params;
-    const currentUserId = get(req, "identity.id") as string | undefined;
 
-    if (!currentUserId) {
-      res.sendStatus(403);
+    if (!id) {
+      res.status(400).json({ error: "User ID is required" });
       return;
     }
 
-    if (currentUserId.toString() !== id) {
-      res.sendStatus(403);
+    const currentUserId = get(req, "identity.id") as string | undefined;
+
+    if (!currentUserId) {
+      res.sendStatus(403).json({
+        error: "You are not authorized to perform this action",
+      });
       return;
     }
 

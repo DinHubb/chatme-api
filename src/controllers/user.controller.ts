@@ -1,23 +1,33 @@
 import { Request, Response } from "express";
 
 import { userService } from "../services/user.service";
+import { UserUpdateInput } from "../models/user.model";
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { full_name, username, avatar_url, bio } = req.body;
-
-    if (!username && !full_name && !avatar_url && !bio) {
-      res.status(400).json({ error: "No fields to update" });
-      return;
-    }
-
-    const updatedUser = await userService.updateUser(id, {
+    const fields: UserUpdateInput = (({
       full_name,
       username,
       avatar_url,
       bio,
-    });
+    }) => ({
+      full_name,
+      username,
+      avatar_url,
+      bio,
+    }))(req.body);
+
+    const hasFieldsToUpdate = Object.values(fields).some(
+      (val) => val !== undefined && val !== null
+    );
+
+    if (!hasFieldsToUpdate) {
+      res.status(400).json({ error: "No fields to update" });
+      return;
+    }
+
+    const updatedUser = await userService.updateUser(id, fields);
 
     if (!updatedUser) {
       res.status(404).json({ error: "User not found" });

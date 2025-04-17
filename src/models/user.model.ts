@@ -59,8 +59,10 @@ export const userModel = {
     const values: any[] = [];
 
     Object.entries(fieldsToUpdate).forEach(([key, value]) => {
-      fields.push(`${key} = ?`);
-      values.push(value);
+      if (value) {
+        fields.push(`${key} = ?`);
+        values.push(value);
+      }
     });
 
     if (fields.length === 0) return;
