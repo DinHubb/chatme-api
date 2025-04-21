@@ -5,7 +5,9 @@ import http from "http";
 import compression from "compression";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import router from "./router";
+import router from "./routes/index.routes";
+import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
@@ -18,12 +20,21 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
-
 app.use("/api", router());
+
+app.use(
+  "/uploads/avatars",
+  express.static(path.join(__dirname, "../uploads/avatars"))
+);
+
+// Ensure upload dir exists
+const uploadDir = path.join(__dirname, "../uploads/avatars");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const server = http.createServer(app);
 

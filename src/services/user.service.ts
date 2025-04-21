@@ -10,6 +10,10 @@ export const userService = {
     return await userModel.createUser(username, msisdn, password);
   },
 
+  async getAllUsers() {
+    return await userModel.getAllUsers();
+  },
+
   async getUserById(id: string) {
     return await userModel.getUserById(id);
   },

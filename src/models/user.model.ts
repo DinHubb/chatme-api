@@ -15,7 +15,7 @@ export interface User extends RowDataPacket {
 
 export interface UserUpdateInput {
   username?: string;
-  avatar_url?: string | null;
+  avatar_url?: string;
   full_name?: string;
   bio?: string | null;
 }
@@ -32,6 +32,11 @@ export const userModel = {
     );
 
     return result.insertId ? String(result.insertId) : null;
+  },
+
+  async getAllUsers() {
+    const [rows] = await db.execute<User[]>("SELECT * FROM users");
+    return rows;
   },
 
   async getUserById(id: string): Promise<User | null> {

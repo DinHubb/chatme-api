@@ -13,7 +13,7 @@ export const generateToken = (userPayload: UserPayload) => {
   if (!SECRET_KEY) {
     throw new Error("JWT_SECRET is not defined");
   }
-  return jwt.sign(userPayload, SECRET_KEY, { expiresIn: "1h" });
+  return jwt.sign(userPayload, SECRET_KEY, { expiresIn: "8h" });
 };
 
 // Verify a JWT
