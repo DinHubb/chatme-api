@@ -10,8 +10,8 @@ export const userService = {
     return await userModel.createUser(username, msisdn, password);
   },
 
-  async getAllUsers() {
-    return await userModel.getAllUsers();
+  async getAllUsersExcept(currentUserId: string) {
+    return await userModel.getAllUsersExcept(currentUserId);
   },
 
   async getUserById(id: string) {

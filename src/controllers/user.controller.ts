@@ -4,8 +4,11 @@ import { UserUpdateInput } from "../models/user.model";
 
 export const UserController = {
   async getAllUser(req: Request, res: Response) {
+    const currentUserId = req.params.id;
+    console.log(currentUserId);
+
     try {
-      const users = await userService.getAllUsers();
+      const users = await userService.getAllUsersExcept(currentUserId);
       res
         .status(200)
         .json({ users: users, message: "Users fetched successfully" });

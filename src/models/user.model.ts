@@ -34,8 +34,11 @@ export const userModel = {
     return result.insertId ? String(result.insertId) : null;
   },
 
-  async getAllUsers() {
-    const [rows] = await db.execute<User[]>("SELECT * FROM users");
+  async getAllUsersExcept(currentUserId: string) {
+    const [rows] = await db.execute<User[]>(
+      "SELECT * FROM users WHERE id != ?",
+      [currentUserId]
+    );
     return rows;
   },
 

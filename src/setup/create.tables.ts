@@ -14,6 +14,8 @@ async function createSchema() {
       bio TEXT,
       msisdn VARCHAR(20),
       password_hash VARCHAR(255),
+      lastseen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      is_online BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
