@@ -8,7 +8,7 @@ export interface User extends RowDataPacket {
   msisdn: string;
   avatar_url: string | null;
   password_hash: string;
-  bio: string | null;
+  bio: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,7 +17,7 @@ export interface UserUpdateInput {
   username?: string;
   avatar_url?: string;
   full_name?: string;
-  bio?: string | null;
+  bio?: string;
 }
 
 export const userModel = {

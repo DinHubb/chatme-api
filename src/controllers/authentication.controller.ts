@@ -86,6 +86,11 @@ export const me = async (req: any, res: Response): Promise<void> => {
 
     const user = await userService.getUserById(req?.identity.id);
 
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
     res.status(200).json({ user: user });
   } catch (error) {
     console.error("Error in auth/me:", error);

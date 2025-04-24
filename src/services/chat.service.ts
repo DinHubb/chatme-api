@@ -1,29 +1,24 @@
 import { db } from "../config/db";
+import { ChatModel } from "../models/chat.model";
 
 export const ChatService = {
-  async getAllChatsForUser(userId: number) {
-    const [rows] = await db.query(
-      `SELECT c.* FROM chats c
-       JOIN chat_participants cp ON cp.chat_id = c.id
-       WHERE cp.user_id = ?`,
-      [userId]
-    );
-    return rows;
+  async getOrCreateChat(userId: number, otherUserId: number) {
+    return await ChatModel.findOrCreateChat(userId, otherUserId);
   },
 
-  async createChat(name: string, userIds: number[]) {
-    const [result] = await db.query("INSERT INTO chats (name) VALUES (?)", [
-      name,
-    ]);
-    const chatId = (result as any).insertId;
+  async getMessages(chatId: number) {
+    return await ChatModel.getChatMessages(chatId);
+  },
 
-    for (const userId of userIds) {
-      await db.query(
-        "INSERT INTO chat_participants (chat_id, user_id) VALUES (?, ?)",
-        [chatId, userId]
-      );
-    }
+  async sendMessage(chatId: number, senderId: number, content: string) {
+    await ChatModel.createMessage(chatId, senderId, content);
+  },
 
-    return { chatId };
+  async getChatRoomName(chat: any, userId: number) {
+    return await ChatModel.getOtherUserName(chat, userId);
+  },
+
+  async getUserChats(userId: number) {
+    return await ChatModel.getChatsByUserId(userId);
   },
 };
